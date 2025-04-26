@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-image 0.5s ease;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+        }
+
+        body.homepage {
+            background-image: url('bg2.jpg');
+        }
+
+        header {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .city-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 30px 50px;
+            margin-top: 200px;
+            font-size: 15px;
+            border: color-mix(in srgb, color percentage, color percentage);
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: rgba(175, 174, 174, 0.5);
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005f9e;
+        }
+
+        .weather-info {
+            text-align: center;
+            background-image: url('bg2.jpg');
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .weather-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .weather-info p {
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body class="homepage">
+    <header>
+        <h1>Weather Information</h1>
+    </header>
+    <div class="container">
+        <div class="city-buttons">
+            <button onclick="getWeather('New York', 'url(Newyork.jpg)')">New York</button>
+            <button onclick="getWeather('London', 'url(London.jpg)')">London</button>
+            <button onclick="getWeather('Tokyo', 'url(Japan.jpg)')">Tokyo</button>
+            <button onclick="getWeather('Colombo', 'url(Colombo.jpg)')">Colombo</button>
+            <button onclick="getWeather('Dubai', 'url(Dubai.jpg)')">Dubai</button>
+        </div>
+        <div id="weather" class="weather-info" style="display: none;"></div>
+    </div>
+    <footer>
+        <p>Oshanda's Weather App &copy; 2024</p>
+    </footer>
+
+    <script>
+        const apiKey = '0001bd6f025590f80b8dc23b3142aa4a'; // OpenWeatherMap API key
+
+        async function getWeather(city, backgroundImage) {
+            const weatherDiv = document.getElementById('weather');
+            document.body.style.backgroundImage = backgroundImage;
+
+            weatherDiv.style.display = 'block';
+            weatherDiv.innerHTML = '<p>Loading...</p>';
+
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Unable to fetch weather data');
+                }
+                const data = await response.json();
+                const { temp } = data.main;
+                const description = data.weather[0].description;
+                const { speed } = data.wind;
+
+                weatherDiv.innerHTML = `
+                    <h2>${city}</h2>
+                    <p><strong>Temperature:</strong> ${temp}&#8451;</p>
+                    <p><strong>Weather:</strong> ${description.charAt(0).toUpperCase() + description.slice(1)}</p>
+                    <p><strong>Wind Speed:</strong> ${speed} m/s</p>
+                `;
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                weatherDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
